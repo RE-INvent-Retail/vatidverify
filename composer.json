@@ -1,0 +1,34 @@
+{
+    "name": "wdo/password-policy",
+    "type": "library",
+    "description": "A PHP library for validation of VAT identification numbers",
+    "keywords": ["vat", "verification", "verify", "tax", "evatr", "vies"],
+    "autoload": {
+        "psr-4": {
+            "VatValidate\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Natalia Santy",
+            "email": "natalia.santy@re-in.de",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "devops@re-in.de",
+        "issues": "https://redmine.re-in.de"
+    },
+
+    "require": {
+        "php": "8.*",
+        "dragonbe/vies": "^2",
+        "ext-soap": "*",
+        "phpxmlrpc/phpxmlrpc": "^4.10",
+        "ext-simplexml": "*",
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    }
+}
