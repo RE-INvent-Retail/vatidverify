@@ -12,9 +12,18 @@ abstract class AbstractProvider
     private string $postcode = '';
     private string $city = '';
     private bool $testServiceActive = false;
+    private bool $activeCountryCheck = true;
+    private bool $getResponse = false;
 
-    abstract public function simpleValidate() : bool;
-    abstract public function qualifiedValidate() : array;
+    /**
+     * @return bool|Response
+     */
+    abstract public function simpleValidate() : bool|Response;
+
+    /**
+     * @return Response
+     */
+    abstract public function qualifiedValidate() : Response;
 
     public function getRequesterVatId(): string
     {
@@ -94,5 +103,25 @@ abstract class AbstractProvider
     public function isTestServiceActive(): bool
     {
         return $this->testServiceActive;
+    }
+
+    public function isActiveCountryCheck(): bool
+    {
+        return $this->activeCountryCheck;
+    }
+
+    public function setActiveCountryCheck(bool $activeCountryCheck): void
+    {
+        $this->activeCountryCheck = $activeCountryCheck;
+    }
+
+    public function setGetResponse(bool $getResponse): void
+    {
+        $this->getResponse = $getResponse;
+    }
+
+    public function isGetResponse(): bool
+    {
+        return $this->getResponse;
     }
 }

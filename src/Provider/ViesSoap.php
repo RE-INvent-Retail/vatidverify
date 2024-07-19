@@ -4,7 +4,8 @@ namespace VatValidate\Provider;
 
 use DragonBe\Vies\Vies;
 use VatValidate\AbstractProvider;
-use VatValidate\Exceptions\RequiredValuesException;
+use VatValidate\Exceptions\InvalidArgumentException;
+use VatValidate\Response;
 
 class ViesSoap extends AbstractProvider
 {
@@ -15,11 +16,17 @@ class ViesSoap extends AbstractProvider
         $this->vies = new Vies();
     }
 
-    public function simpleValidate(): bool
+    /**
+     * @return bool|Response
+     * @throws InvalidArgumentException
+     * @throws \DragonBe\Vies\ViesException
+     * @throws \DragonBe\Vies\ViesServiceException
+     */
+    public function simpleValidate(): bool|Response
     {
         // exception vatid not set
         if (empty($this->getVatId())) {
-            throw new RequiredValuesException('Required value "vat id" is not set.');
+            throw new InvalidArgumentException('Required value "vat id" is not set.');
         }
 
         if ($this->isTestServiceActive()) {
@@ -30,10 +37,19 @@ class ViesSoap extends AbstractProvider
 
         $requestArray = $this->vies->splitVatId($this->getVatId());
         $result = $this->vies->validateVat($requestArray['country'], $requestArray['id']);
+        if ($this->isGetResponse()) {
+            return new Response($result);
+        }
         return $result->isValid();
     }
 
-    public function qualifiedValidate(): array
+    /**
+     * @return Response
+     * @throws InvalidArgumentException
+     * @throws \DragonBe\Vies\ViesException
+     * @throws \DragonBe\Vies\ViesServiceException
+     */
+    public function qualifiedValidate(): Response
     {
         if (empty($this->getVatId()) ||
             empty($this->getRequesterVatId()) ||
@@ -41,7 +57,7 @@ class ViesSoap extends AbstractProvider
             empty($this->getStreet()) ||
             empty($this->getPostcode()) ||
             empty($this->getCity())) {
-            throw new RequiredValuesException('Required values are not set.');
+            throw new InvalidArgumentException('Required values are not set.');
         }
 
         if ($this->isTestServiceActive()) {
@@ -63,6 +79,6 @@ class ViesSoap extends AbstractProvider
             $this->getPostcode(),
             $this->getCity()
         );
-        return $result->toArray();
+        return new Response($result);
     }
 }

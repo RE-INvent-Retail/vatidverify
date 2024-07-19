@@ -6,35 +6,47 @@ use PhpXmlRpc\Client;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Value;
 use VatValidate\AbstractProvider;
-use VatValidate\Exceptions\RequiredValuesException;
+use VatValidate\Exceptions\InvalidArgumentException;
+use VatValidate\Helper\CountryCheck;
 use VatValidate\Helper\EVatRResponse;
+use VatValidate\Response;
 
 class EVatR extends AbstractProvider
 {
     /**
      * Evatr url for the XML RPC.
      */
-    const EVATRINTERFACEURL = 'https://evatr.bff-online.de';
+    const EVATR_URL = 'https://evatr.bff-online.de';
 
     private Client $client;
-    private EVatRResponse $response;
 
     public function __construct()
     {
-        $this->client = new Client(self::EVATRINTERFACEURL);
+        $this->client = new Client(self::EVATR_URL);
     }
 
-    public function simpleValidate() : bool
+    /**
+     * @return bool|Response
+     * @throws InvalidArgumentException
+     */
+    public function simpleValidate() : bool|Response
     {
         // exception if vatid and ownvatid are not set
         if (empty($this->getVatId()) || empty($this->getRequesterVatId())) {
-            throw new RequiredValuesException('Required values "vat id" or "requester vat id" are not set.');
+            throw new InvalidArgumentException('Required values "vat id" or "requester vat id" are not set.');
         }
-        $this->response = $this->sendRequest();
-        return $this->response->isValid();
+        $result = $this->sendRequest();
+        if ($this->isGetResponse()) {
+            return new Response(null, $result);
+        }
+        return $result->isValid();
     }
 
-    public function qualifiedValidate(): array
+    /**
+     * @return Response
+     * @throws InvalidArgumentException
+     */
+    public function qualifiedValidate(): Response
     {
         if (empty($this->getVatId()) ||
             empty($this->getRequesterVatId()) ||
@@ -43,15 +55,26 @@ class EVatR extends AbstractProvider
             empty($this->getPostcode()) ||
             empty($this->getCity())
         ) {
-            throw new RequiredValuesException('One of required values "vat id", "requester vat id" or company address including company name are not set.');
+            throw new InvalidArgumentException('One of required values "vat id", "requester vat id" or company address including company name are not set.');
         }
-        $this->response = $this->sendRequest();
-        return $this->response->toArray();
+        $response = $this->sendRequest();
+        return new Response(null, $response);
     }
 
-    private function sendRequest()
+    private function sendRequest() : EVatRResponse
     {
-        // todo check country
+        if ($this->isActiveCountryCheck() && !CountryCheck::isValidPattern(substr($this->getVatId(), 2), substr($this->getVatId(), 0, 2))) {
+            $now = new \DateTime();
+            $data = [
+                'UstId_1' => $this->getRequesterVatId(),
+                'UstId_2' => $this->getVatId(),
+                'ErrorCode' => 201,
+                'Datum' => $now->format('d.m.Y'),
+                'Uhrzeit' => $now->format('H:i:s')
+            ];
+            return new EVatRResponse(null, $data);
+        }
+
         $xmlResponse = $this->client->send(new Request(
             'evatrRPC', [
                 new Value($this->getRequesterVatId()),
@@ -66,11 +89,4 @@ class EVatR extends AbstractProvider
         return new EVatRResponse($xmlResponse->value()->me['string']);
     }
 
-    public function getResponse() : EVatRResponse
-    {
-        if (!isset($this->response)) {
-            $this->simpleValidate();
-        }
-        return $this->response;
-    }
 }
