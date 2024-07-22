@@ -8,7 +8,8 @@ use VatValidate\VatValidate;
 class ViesSoapTest extends TestCase
 {
     private VatValidate $vatValidate;
-    private string $vatId = 'DE131832937';
+    private string $vatId = 'DE100';
+    private string $failedVatId = 'DE200';
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,7 +33,7 @@ class ViesSoapTest extends TestCase
      */
     public function testFailureVatNumberValidation()
     {
-        $response = $this->vatValidate->simpleValidate('DE0123.ABC.456');
+        $response = $this->vatValidate->simpleValidate($this->failedVatId, '', true);
         $this->assertFalse($response);
     }
 
@@ -42,16 +43,22 @@ class ViesSoapTest extends TestCase
     public function testFailureQualifiedVatNumberValidation()
     {
         $response = $this->vatValidate->qualifiedValidation(
-            'DE0123.ABC.456',
-            'DE0123.ABC.456',
+            $this->failedVatId,
+            $this->vatId,
             'Test',
             'Test street',
             '123456',
-            'Test city'
+            'Test city',
+            '',
+            true
         );
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertFalse($response->isValid());
+        $this->assertNull($response->getMatchCompanyName());
+        $this->assertNull($response->getMatchCompanyStreet());
+        $this->assertNull($response->getMatchCompanyZipCode());
+        $this->assertNull($response->getMatchCompanyCity());
         $this->assertSame(201, $response->getResponseCode());
     }
 
@@ -69,13 +76,7 @@ class ViesSoapTest extends TestCase
      */
     public function testSuccessVatNumberValidationResponse()
     {
-        // catch if test service is unavailable
-        try {
-            $response = $this->vatValidate->simpleValidate($this->vatId, '', false, true);
-        } catch (\Throwable $th) {
-            $this->vatValidate->setService(false);
-            $response = $this->vatValidate->simpleValidate($this->vatId, '', false, true);
-        }
+        $response = $this->vatValidate->simpleValidate($this->vatId, '', true, true);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->isValid());

@@ -12,7 +12,8 @@ class ViesRestTest extends TestCase
      * @var VatValidate
      */
     private VatValidate $vatValidate;
-    private string $vatId = 'DE131832937';
+    private string $vatId = 'DE100';
+    private string $failedVatId = 'DE200';
 
     protected function setUp(): void
     {
@@ -25,14 +26,7 @@ class ViesRestTest extends TestCase
      */
     public function testSuccessVatNumberValidation()
     {
-        // catch if test service is unavailable
-        try {
-            $response = $this->vatValidate->simpleValidate($this->vatId);
-        } catch (\Throwable $th) {
-            $this->vatValidate->setService(false);
-            $response = $this->vatValidate->simpleValidate($this->vatId);
-        }
-
+        $response = $this->vatValidate->simpleValidate($this->vatId, '', true);
         $this->assertTrue($response);
     }
 
@@ -41,13 +35,7 @@ class ViesRestTest extends TestCase
      */
     public function testSuccessVatNumberValidationResponse()
     {
-        // catch if test service is unavailable
-        try {
-            $response = $this->vatValidate->simpleValidate($this->vatId, '', false, true);
-        } catch (\Throwable $th) {
-            $this->vatValidate->setService(false);
-            $response = $this->vatValidate->simpleValidate($this->vatId, '', false, true);
-        }
+        $response = $this->vatValidate->simpleValidate($this->vatId, '', true, true);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->isValid());
@@ -58,34 +46,23 @@ class ViesRestTest extends TestCase
      */
     public function testSuccessQualifiedVatNumberValidation()
     {
-        // catch if test service is unavailable
-        try {
-            $response = $this->vatValidate->qualifiedValidation(
-                $this->vatId,
-                'DE309928677',
-                'Conrad Electronic SE',
-                'Klaus-Conrad-Str. 1',
-                '92242',
-                'Hirschau'
-            );
-        } catch (\Throwable $th) {
-            $this->vatValidate->setService(false);
-            $response = $this->vatValidate->qualifiedValidation(
-                $this->vatId,
-                'DE309928677',
-                'Conrad Electronic SE',
-                'Klaus-Conrad-Str. 1',
-                '92242',
-                'Hirschau'
-            );
-        }
+        $response = $this->vatValidate->qualifiedValidation(
+            $this->vatId,
+            $this->vatId,
+            'John Doe',
+            '123 Main St',
+            '1000',
+            'Anytown',
+            '000',
+            true
+        );
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->isValid());
-        $this->assertNull($response->getMatchCompanyName());
-        $this->assertNull($response->getMatchCompanyStreet());
-        $this->assertNull($response->getMatchCompanyZipCode());
-        $this->assertNull($response->getMatchCompanyCity());
+        $this->assertTrue($response->getMatchCompanyName());
+        $this->assertTrue($response->getMatchCompanyStreet());
+        $this->assertTrue($response->getMatchCompanyZipCode());
+        $this->assertTrue($response->getMatchCompanyCity());
         $this->assertNotEmpty($response->getRawResponse());
         $this->assertSame($this->vatId, $response->getVatId());
     }
@@ -95,7 +72,7 @@ class ViesRestTest extends TestCase
      */
     public function testFailureVatNumberValidation()
     {
-        $response = $this->vatValidate->simpleValidate('DE0123.ABC.456');
+        $response = $this->vatValidate->simpleValidate($this->failedVatId, '', true);
         $this->assertFalse($response);
     }
 
@@ -105,16 +82,22 @@ class ViesRestTest extends TestCase
     public function testFailureQualifiedVatNumberValidation()
     {
         $response = $this->vatValidate->qualifiedValidation(
-            'DE0123.ABC.456',
-            'DE0123.ABC.456',
+            $this->failedVatId,
+            $this->failedVatId,
             'Test',
             'Test street',
             '123456',
-            'Test city'
+            'Test city',
+            '',
+            true
         );
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertFalse($response->isValid());
+        $this->assertNull($response->getMatchCompanyName());
+        $this->assertNull($response->getMatchCompanyStreet());
+        $this->assertNull($response->getMatchCompanyZipCode());
+        $this->assertNull($response->getMatchCompanyCity());
         $this->assertSame(201, $response->getResponseCode());
     }
 

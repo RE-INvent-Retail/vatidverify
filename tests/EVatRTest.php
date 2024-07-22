@@ -9,6 +9,7 @@ class EVatRTest extends TestCase
 {
     private VatValidate $vatValidate;
     private string $vatId = 'DE131832937';
+    private string $failedVatId = 'DE0123.ABC.456';
     private string $requesterVatId = 'DE309928677';
     protected function setUp(): void
     {
@@ -24,15 +25,15 @@ class EVatRTest extends TestCase
 
     public function testFailureVatNumberValidation()
     {
-        $response = $this->vatValidate->simpleValidate('DE0123.ABC.456', $this->requesterVatId);
+        $response = $this->vatValidate->simpleValidate($this->failedVatId, $this->requesterVatId);
         $this->assertFalse($response);
     }
 
     public function testFailureQualifiedVatNumberValidation()
     {
         $response = $this->vatValidate->qualifiedValidation(
-            'DE0123.ABC.456',
-            'DE0123.ABC.456',
+            $this->failedVatId,
+            $this->failedVatId,
             'Test',
             'Test street',
             '123456',
@@ -42,8 +43,8 @@ class EVatRTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertFalse($response->isValid());
         $this->assertSame(201, $response->getResponseCode());
-        $this->assertSame('DE0123.ABC.456', $response->getVatId());
-        $this->assertSame('DE0123.ABC.456', $response->getRequesterVatId());
+        $this->assertSame($this->failedVatId, $response->getVatId());
+        $this->assertSame($this->failedVatId, $response->getRequesterVatId());
     }
 
     public function testSimpleValidation()

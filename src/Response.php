@@ -29,7 +29,7 @@ class Response
         if (!empty($viesResponse)) {
             $this->raw = json_encode($viesResponse->toArray());
             $this->valid = $viesResponse->isValid();
-            $this->vatId = $viesResponse->getVatNumber();
+            $this->vatId = $viesResponse->getCountryCode() . $viesResponse->getVatNumber();
             $this->companyName = $viesResponse->getName();
             $this->companyAddress = $viesResponse->getAddress();
             $this->requestDate = $viesResponse->getRequestDate();
