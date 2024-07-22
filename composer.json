@@ -1,7 +1,7 @@
 {
     "name": "wdo/password-policy",
     "type": "library",
-    "description": "A PHP library for validation of VAT identification numbers",
+    "description": "A PHP library for validation of VAT identification numbers and detailed information",
     "keywords": ["vat", "verification", "verify", "tax", "evatr", "vies"],
     "autoload": {
         "psr-4": {
