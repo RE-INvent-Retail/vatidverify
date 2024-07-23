@@ -28,16 +28,17 @@ class VatValidate
     }
 
     /**
+     * Gets boolean or response for simple validation.
      * @param string $vatId
      * @param string $requesterVatId Only required in EVatR provider.
-     * @param bool $skipCountryValidation
      * @param bool $getResponse If set to true, return response object instead of bool.
+     * @param bool $skipCountryValidation
      * @return bool|Response
      */
     public function simpleValidate(string $vatId,
                                    string $requesterVatId = '',
-                                   bool $skipCountryValidation = false,
-                                   bool $getResponse = false): bool|Response
+                                   bool $getResponse = false,
+                                   bool $skipCountryValidation = false): bool|Response
     {
         $this->provider->setVatId($vatId);
         $this->provider->setRequesterVatId($requesterVatId);
@@ -51,22 +52,23 @@ class VatValidate
     }
 
     /**
+     * Gets response for qualified validation.
      * @param string $vatId
      * @param string $requesterVatId
      * @param string $companyName
      * @param string $companyStreet
-     * @param string $companyPostcode
-     * @param string $companyCity
-     * @param string $companyType Optional, only important for vies provider.
+     * @param string $companyPostcode Optional for EVatR, but recommended.
+     * @param string $companyCity Optional for EVatR, but recommended.
+     * @param string $companyType Optional, only important for vies provider for some countries, e.g. spain or greek.
      * @param bool $skipCountryValidation
      * @return Response
      */
     public function qualifiedValidation(string $vatId,
-                                        string $requesterVatId,
                                         string $companyName,
-                                        string $companyStreet,
-                                        string $companyPostcode,
                                         string $companyCity,
+                                        string $companyStreet = '',
+                                        string $companyPostcode = '',
+                                        string $requesterVatId = '',
                                         string $companyType = '',
                                         bool $skipCountryValidation = false
     ): Response

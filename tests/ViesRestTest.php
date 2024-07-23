@@ -26,7 +26,7 @@ class ViesRestTest extends TestCase
      */
     public function testSuccessVatNumberValidation()
     {
-        $response = $this->vatValidate->simpleValidate($this->vatId, '', true);
+        $response = $this->vatValidate->simpleValidate($this->vatId, '', false, true);
         $this->assertTrue($response);
     }
 
@@ -48,11 +48,11 @@ class ViesRestTest extends TestCase
     {
         $response = $this->vatValidate->qualifiedValidation(
             $this->vatId,
-            $this->vatId,
             'John Doe',
+            'Anytown',
             '123 Main St',
             '1000',
-            'Anytown',
+            $this->vatId,
             '000',
             true
         );
@@ -72,7 +72,7 @@ class ViesRestTest extends TestCase
      */
     public function testFailureVatNumberValidation()
     {
-        $response = $this->vatValidate->simpleValidate($this->failedVatId, '', true);
+        $response = $this->vatValidate->simpleValidate($this->failedVatId, '', false,true);
         $this->assertFalse($response);
     }
 
@@ -83,11 +83,11 @@ class ViesRestTest extends TestCase
     {
         $response = $this->vatValidate->qualifiedValidation(
             $this->failedVatId,
-            $this->failedVatId,
             'Test',
+            'Test city',
             'Test street',
             '123456',
-            'Test city',
+            '',
             '',
             true
         );
@@ -118,12 +118,13 @@ class ViesRestTest extends TestCase
     public function testExceptionIsRaisedForRequest()
     {
         $this->expectException(RequestErrorException::class);
-        $this->vatValidate->simpleValidate('AB123456789', '', true);
+        $this->vatValidate->simpleValidate('AB123456789', '', false,true);
     }
 
     public function testSuccessCheckStatus()
     {
         $result = $this->vatValidate->getViesCountryAvailability();
         $this->assertIsArray($result);
+        $this->assertNotEmpty($result);
     }
 }

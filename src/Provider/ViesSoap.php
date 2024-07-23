@@ -17,6 +17,7 @@ class ViesSoap extends AbstractProvider
     }
 
     /**
+     * Performs simple validation request.
      * @return bool|Response
      * @throws InvalidArgumentException
      * @throws \DragonBe\Vies\ViesException
@@ -44,6 +45,7 @@ class ViesSoap extends AbstractProvider
     }
 
     /**
+     * Performs qualified validation request.
      * @return Response
      * @throws InvalidArgumentException
      * @throws \DragonBe\Vies\ViesException
@@ -52,7 +54,6 @@ class ViesSoap extends AbstractProvider
     public function qualifiedValidate(): Response
     {
         if (empty($this->getVatId()) ||
-            empty($this->getRequesterVatId()) ||
             empty($this->getCompanyName()) ||
             empty($this->getStreet()) ||
             empty($this->getPostcode()) ||

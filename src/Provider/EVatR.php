@@ -26,12 +26,14 @@ class EVatR extends AbstractProvider
     }
 
     /**
+     * Performs simple validation request.
+     * Vat id and requester vat id are required values.
      * @return bool|Response
      * @throws InvalidArgumentException
      */
     public function simpleValidate() : bool|Response
     {
-        // exception if vatid and ownvatid are not set
+        // exception if vat id and requester vat id are not set
         if (empty($this->getVatId()) || empty($this->getRequesterVatId())) {
             throw new InvalidArgumentException('Required values "vat id" or "requester vat id" are not set.');
         }
@@ -43,6 +45,9 @@ class EVatR extends AbstractProvider
     }
 
     /**
+     * Performs qualified validation request.
+     * VatId, RequesterVatId, CompanyName and City are mandatory values.
+     *
      * @return Response
      * @throws InvalidArgumentException
      */
@@ -51,19 +56,22 @@ class EVatR extends AbstractProvider
         if (empty($this->getVatId()) ||
             empty($this->getRequesterVatId()) ||
             empty($this->getCompanyName()) ||
-            empty($this->getStreet()) ||
-            empty($this->getPostcode()) ||
             empty($this->getCity())
         ) {
-            throw new InvalidArgumentException('One of required values "vat id", "requester vat id" or company address including company name are not set.');
+            throw new InvalidArgumentException('One of required values vat id, requester vat id, company name or city are not set.');
         }
         $response = $this->sendRequest();
         return new Response(null, $response);
     }
 
+    /**
+     * Performs request call, unless pre-check fails.
+     * @return EVatRResponse
+     */
     private function sendRequest() : EVatRResponse
     {
-        if ($this->isActiveCountryCheck() && !CountryCheck::isValidPattern(substr($this->getVatId(), 2), substr($this->getVatId(), 0, 2))) {
+        if ($this->isActiveCountryCheck() && !CountryCheck::isValidPattern(
+            substr($this->getVatId(), 2), substr($this->getVatId(), 0, 2))) {
             $now = new \DateTime();
             $data = [
                 'UstId_1' => $this->getRequesterVatId(),

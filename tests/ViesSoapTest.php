@@ -33,7 +33,7 @@ class ViesSoapTest extends TestCase
      */
     public function testFailureVatNumberValidation()
     {
-        $response = $this->vatValidate->simpleValidate($this->failedVatId, '', true);
+        $response = $this->vatValidate->simpleValidate($this->failedVatId, '', false,true);
         $this->assertFalse($response);
     }
 
@@ -44,11 +44,11 @@ class ViesSoapTest extends TestCase
     {
         $response = $this->vatValidate->qualifiedValidation(
             $this->failedVatId,
-            $this->vatId,
             'Test',
+            'Test city',
             'Test street',
             '123456',
-            'Test city',
+            $this->vatId,
             '',
             true
         );
@@ -68,7 +68,7 @@ class ViesSoapTest extends TestCase
     public function testExceptionIsRaisedForRequest()
     {
         $this->expectException(\VatValidate\Exceptions\RequestErrorException::class);
-        $this->vatValidate->simpleValidate('AB123456789', '', true);
+        $this->vatValidate->simpleValidate('AB123456789', '', false,true);
     }
 
     /**

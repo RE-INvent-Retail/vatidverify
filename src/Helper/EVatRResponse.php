@@ -23,6 +23,10 @@ class EVatRResponse
     private string $validUntil = '';
     private bool $fromXML = false;
 
+    /**
+     * Result mapping of response matching.
+     * @var array
+     */
     private array $responseResults = [
         'A' => true,
         'B' => false,
@@ -123,6 +127,7 @@ class EVatRResponse
     }
 
     /**
+     * Texts for possible response codes.
      * @return string[]
      */
     public static function getResponseCodeTexts() : array

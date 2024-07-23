@@ -15,12 +15,16 @@ class ViesRest extends AbstractProvider
 {
 
     const VIES_BASE_URI = 'https://ec.europa.eu/taxation_customs/vies/rest-api/';
-    const VIES_REST = '/check-vat-number';
-    const VIES_REST_TEST = '/check-vat-test-service';
-    const VIES_REST_STATUS = '/check-status';
+    const VIES_REST = 'check-vat-number';
+    const VIES_REST_TEST = 'check-vat-test-service';
+    const VIES_REST_STATUS = 'check-status';
     private Client $client;
     private string $rawContent = '';
 
+    /**
+     * Result mapping of country availability.
+     * @var array
+     */
     private array $availabilityResults = [
         'Available' => true,
         'Unavailable' => false,
@@ -32,6 +36,7 @@ class ViesRest extends AbstractProvider
     }
 
     /**
+     * Performs simple validation request.
      * @return bool|Response
      * @throws InvalidArgumentException
      * @throws RequestErrorException
@@ -50,6 +55,7 @@ class ViesRest extends AbstractProvider
     }
 
     /**
+     * Performs qualified validation request.
      * @return Response
      * @throws RequestErrorException
      * @throws InvalidArgumentException
@@ -57,7 +63,6 @@ class ViesRest extends AbstractProvider
     public function qualifiedValidate(): Response
     {
         if (empty($this->getVatId()) ||
-            empty($this->getRequesterVatId()) ||
             empty($this->getCompanyName()) ||
             empty($this->getStreet()) ||
             empty($this->getPostcode()) ||

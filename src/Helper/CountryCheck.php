@@ -4,6 +4,12 @@ namespace VatValidate\Helper;
 
 class CountryCheck
 {
+    /**
+     * Checks if given vat id matches country pattern.
+     * @param string $vatId Vat id without country code in the beginning.
+     * @param string $country
+     * @return bool
+     */
     public static function isValidPattern(string $vatId, string $country) : bool {
         if (!array_key_exists($country, self::getCountriesPatterns())) {
             return false;
@@ -12,6 +18,10 @@ class CountryCheck
         return preg_match( '/^(' . $pattern . ')$/', $vatId ) === 1;
     }
 
+    /**
+     * Array of patterns by country code.
+     * @return string[]
+     */
     private static function getCountriesPatterns() : array
     {
         $d9 = '\d{9}';

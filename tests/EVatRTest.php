@@ -33,11 +33,11 @@ class EVatRTest extends TestCase
     {
         $response = $this->vatValidate->qualifiedValidation(
             $this->failedVatId,
-            $this->failedVatId,
             'Test',
+            'Test city',
             'Test street',
             '123456',
-            'Test city'
+            $this->failedVatId,
         );
 
         $this->assertInstanceOf(Response::class, $response);
@@ -49,7 +49,7 @@ class EVatRTest extends TestCase
 
     public function testSimpleValidation()
     {
-        $response = $this->vatValidate->simpleValidate($this->vatId, $this->requesterVatId, false, true);
+        $response = $this->vatValidate->simpleValidate($this->vatId, $this->requesterVatId, true);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->isValid());
     }
@@ -58,11 +58,11 @@ class EVatRTest extends TestCase
         $company = 'Conrad Electronic SE';
         $response = $this->vatValidate->qualifiedValidation(
             $this->vatId,
-            $this->requesterVatId,
             $company,
+        'Hirschau',
         'Klaus-Conrad-Str. 1',
         '92242',
-        'Hirschau');
+            $this->requesterVatId);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertTrue($response->isValid());
