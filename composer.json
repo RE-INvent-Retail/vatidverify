@@ -1,5 +1,5 @@
 {
-    "name": "wdo/password-policy",
+    "name": "wdo/vatidverify",
     "type": "library",
     "description": "A PHP library for validation of VAT identification numbers and detailed information",
     "keywords": ["vat", "verification", "verify", "tax", "evatr", "vies"],
