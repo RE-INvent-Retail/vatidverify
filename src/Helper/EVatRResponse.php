@@ -23,6 +23,8 @@ class EVatRResponse
     private string $validUntil = '';
     private bool $fromXML = false;
 
+    const RETRY_ERROR_CODES = [205, 208, 217, 999];
+
     /**
      * Result mapping of response matching.
      * @var array

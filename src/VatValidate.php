@@ -2,6 +2,8 @@
 
 namespace VatValidate;
 
+use VatValidate\Exceptions\InvalidArgumentException;
+use VatValidate\Exceptions\RequestErrorException;
 use VatValidate\Provider\EVatR;
 use VatValidate\Provider\ViesRest;
 use VatValidate\Provider\ViesSoap;
@@ -34,6 +36,8 @@ class VatValidate
      * @param bool $getResponse If set to true, return response object instead of bool.
      * @param bool $skipCountryValidation
      * @return bool|Response
+     * @throws InvalidArgumentException
+     * @throws RequestErrorException
      */
     public function simpleValidate(string $vatId,
                                    string $requesterVatId = '',
@@ -54,14 +58,16 @@ class VatValidate
     /**
      * Gets response for qualified validation.
      * @param string $vatId
-     * @param string $requesterVatId
      * @param string $companyName
+     * @param string $companyCity Optional for EVatR, but recommended.
      * @param string $companyStreet
      * @param string $companyPostcode Optional for EVatR, but recommended.
-     * @param string $companyCity Optional for EVatR, but recommended.
+     * @param string $requesterVatId
      * @param string $companyType Optional, only important for vies provider for some countries, e.g. spain or greek.
      * @param bool $skipCountryValidation
      * @return Response
+     * @throws InvalidArgumentException
+     * @throws RequestErrorException
      */
     public function qualifiedValidation(string $vatId,
                                         string $companyName,

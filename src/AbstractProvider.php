@@ -2,6 +2,9 @@
 
 namespace VatValidate;
 
+use VatValidate\Exceptions\InvalidArgumentException;
+use VatValidate\Exceptions\RequestErrorException;
+
 abstract class AbstractProvider
 {
     private string $requesterVatId = '';
@@ -17,11 +20,15 @@ abstract class AbstractProvider
 
     /**
      * @return bool|Response
+     * @throws InvalidArgumentException
+     * @throws RequestErrorException
      */
     abstract public function simpleValidate() : bool|Response;
 
     /**
      * @return Response
+     * @throws InvalidArgumentException
+     * @throws RequestErrorException
      */
     abstract public function qualifiedValidate() : Response;
 

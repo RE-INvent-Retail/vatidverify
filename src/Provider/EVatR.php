@@ -7,6 +7,7 @@ use PhpXmlRpc\Request;
 use PhpXmlRpc\Value;
 use VatValidate\AbstractProvider;
 use VatValidate\Exceptions\InvalidArgumentException;
+use VatValidate\Exceptions\RequestErrorException;
 use VatValidate\Helper\CountryCheck;
 use VatValidate\Helper\EVatRResponse;
 use VatValidate\Response;
@@ -29,7 +30,7 @@ class EVatR extends AbstractProvider
      * Performs simple validation request.
      * Vat id and requester vat id are required values.
      * @return bool|Response
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|RequestErrorException
      */
     public function simpleValidate() : bool|Response
     {
@@ -49,7 +50,7 @@ class EVatR extends AbstractProvider
      * VatId, RequesterVatId, CompanyName and City are mandatory values.
      *
      * @return Response
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|RequestErrorException
      */
     public function qualifiedValidate(): Response
     {
@@ -67,6 +68,7 @@ class EVatR extends AbstractProvider
     /**
      * Performs request call, unless pre-check fails.
      * @return EVatRResponse
+     * @throws RequestErrorException
      */
     private function sendRequest() : EVatRResponse
     {
@@ -94,7 +96,19 @@ class EVatR extends AbstractProvider
             ]
         ));
 
-        return new EVatRResponse($xmlResponse->value()->me['string']);
+        // throw exception if error occurs
+        if ($xmlResponse->faultCode() !== 0) {
+            throw new RequestErrorException($xmlResponse->faultString());
+        }
+
+        $response = new EVatRResponse($xmlResponse->value()->me['string']);
+
+        // throw exception if error code is in retry error codes
+        if (in_array($response->getResponseCode(), EVatRResponse::RETRY_ERROR_CODES)) {
+            throw new RequestErrorException(\VatValidate\Helper\EVatRResponse::getResponseCodeTexts()[$response->getResponseCode()]);
+        }
+
+        return $response;
     }
 
 }
