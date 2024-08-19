@@ -225,4 +225,26 @@ class Response
     {
         return $this->responseCode;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray() : array
+    {
+        return [
+            'valid' => $this->valid,
+            'vatId' => $this->vatId,
+            'requesterVatId' => $this->requesterVatId,
+            'companyName' => $this->companyName,
+            'companyAddress' => $this->companyAddress,
+            'requestDate' => $this->requestDate->format('Y-m-d H:i:s'),
+            'matchCompanyName' => $this->matchCompanyName,
+            'matchCompanyStreet' => $this->matchCompanyStreet,
+            'matchCompanyZipCode' => $this->matchCompanyZipCode,
+            'matchCompanyCity' => $this->matchCompanyCity,
+            'responseCode' => $this->responseCode,
+            'array' => $this->array,
+            'raw' => $this->raw
+        ];
+    }
 }
