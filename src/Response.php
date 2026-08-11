@@ -69,7 +69,7 @@ class Response
         'INVALID' => false,
         'NOT_PROCESSED' => null
     ];
-    public function __construct(CheckVatResponse $viesResponse = null, EVatRResponse $evatResponse = null)
+    public function __construct(?CheckVatResponse $viesResponse = null, ?EVatRResponse $evatResponse = null)
     {
         if (!empty($viesResponse)) {
             $this->raw = json_encode($viesResponse->toArray());

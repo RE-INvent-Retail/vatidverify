@@ -36,7 +36,7 @@ class EVatRResponse
         'D' => null
     ];
 
-    public function __construct(string $xmlResponse = null, array $data = [])
+    public function __construct(?string $xmlResponse = null, array $data = [])
     {
         if (!empty($xmlResponse)) {
             $this->xml = new \SimpleXMLElement($xmlResponse);
